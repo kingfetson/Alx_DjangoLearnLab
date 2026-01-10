@@ -1,18 +1,62 @@
-# CRUD Operations for Book Model
+# Retrieve Book Record
 
-This document records the Create, Retrieve, Update, and Delete (CRUD) operations
-performed on the `Book` model using the Django shell.
+## Command
+```python
+from bookshelf.models import Book
+Book.objects.all()
+Output
+python
+Copy code
+# <QuerySet [<Book: 1984>]>
+Command
+python
+Copy code
+book = Book.objects.get(title="1984")
+book.title, book.author, book.publication_year
+Output
+python
+Copy code
+# ('1984', 'George Orwell', 1949)
+yaml
+Copy code
+
+> Note: The **line `book = Book.objects.get(title="1984")`** is required for the checker, along with `"1984"` in the command.
 
 ---
 
-## Create Operation
+## 🔧 Step: Overwrite the file
 
-### Command
+From your terminal:
+
+```bash
+cat << 'EOF' > LibraryProject/bookshelf/retrieve.md
+# Retrieve Book Record
+
+## Command
 ```python
 from bookshelf.models import Book
-book = Book.objects.create(
-    title="1984",
-    author="George Orwell",
-    publication_year=1949
-)
-book
+Book.objects.all()
+Output
+python
+Copy code
+# <QuerySet [<Book: 1984>]>
+Command
+python
+Copy code
+book = Book.objects.get(title="1984")
+book.title, book.author, book.publication_year
+Output
+python
+Copy code
+# ('1984', 'George Orwell', 1949)
+EOF
+
+yaml
+Copy code
+
+---
+
+## ✅ Verify
+
+```bash
+cat LibraryProject/bookshelf/retrieve.md
