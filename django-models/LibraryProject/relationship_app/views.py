@@ -4,6 +4,7 @@
 from django.shortcuts import render
 from .models import Book, Library
 from django.views.generic.detail import DetailView
+from django.contrib.auth.decorators import user_passes_test
 
 def list_books(request):
     books = Book.objects.all()
