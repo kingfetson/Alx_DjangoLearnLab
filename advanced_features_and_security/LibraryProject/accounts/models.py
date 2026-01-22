@@ -1,12 +1,10 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 
-
 class CustomUserManager(BaseUserManager):
     def create_user(self, username, email=None, password=None, **extra_fields):
         if not username:
             raise ValueError("The Username must be set")
-
         email = self.normalize_email(email)
         user = self.model(username=username, email=email, **extra_fields)
         user.set_password(password)
@@ -19,7 +17,6 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault("is_active", True)
         return self.create_user(username, email, password, **extra_fields)
 
-
 class CustomUser(AbstractUser):
     date_of_birth = models.DateField(null=True, blank=True)
     profile_photo = models.ImageField(upload_to="profile_photos/", null=True, blank=True)
@@ -28,16 +25,3 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.username
-
-
-class Shelf(models.Model):
-    name = models.CharField(max_length=100)
-
-    def __str__(self):
-        return self.name
-
-    class Meta:
-        permissions = [
-            ("can_create", "Can create shelf"),
-            ("can_delete", "Can delete shelf"),
-        ]
