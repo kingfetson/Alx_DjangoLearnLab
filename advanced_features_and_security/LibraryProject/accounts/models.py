@@ -17,7 +17,6 @@ class CustomUserManager(BaseUserManager):
         extra_fields.setdefault('is_staff', True)
         extra_fields.setdefault('is_superuser', True)
         extra_fields.setdefault('is_active', True)
-
         return self.create_user(username, email, password, **extra_fields)
 
 
@@ -30,4 +29,15 @@ class CustomUser(AbstractUser):
     def __str__(self):
         return self.username
 
-# Create your models here.
+
+class Shelf(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        permissions = [
+            ("can_create", "Can create shelf"),
+            ("can_delete", "Can delete shelf"),
+        ]
