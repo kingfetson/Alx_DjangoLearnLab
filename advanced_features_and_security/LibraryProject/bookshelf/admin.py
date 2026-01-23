@@ -1,8 +1,8 @@
 from django.contrib import admin
-from django.contrib.auth.admin import UserAdmin
+#from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import Group
 from .models import Book
-from accounts.models import CustomUser  # Assuming your CustomUser is in accounts app
+#from accounts.models import CustomUser  # Assuming your CustomUser is in accounts app
 
 # ----------------------------
 # Book Admin
@@ -18,24 +18,24 @@ class BookAdmin(admin.ModelAdmin):
 # ----------------------------
 # Custom User Admin
 # ----------------------------
-class CustomUserAdmin(UserAdmin):
-    model = CustomUser
+#class CustomUserAdmin(UserAdmin):
+  #  model = CustomUser
 
     # Add your extra fields
-    fieldsets = UserAdmin.fieldsets + (
-        ("Additional Info", {
-            "fields": ("date_of_birth", "profile_photo"),
-        }),
-    )
+  #  fieldsets = UserAdmin.fieldsets + (
+   #     ("Additional Info", {
+   #         "fields": ("date_of_birth", "profile_photo"),
+    #    }),
+   # )
 
-    add_fieldsets = UserAdmin.add_fieldsets + (
-        ("Additional Info", {
-            "fields": ("date_of_birth", "profile_photo"),
-        }),
-    )
+   # add_fieldsets = UserAdmin.add_fieldsets + (
+   #     ("Additional Info", {
+    #        "fields": ("date_of_birth", "profile_photo"),
+    #    }),
+    #)
 
 # Register CustomUser
-admin.site.register(CustomUser, CustomUserAdmin)
+#admin.site.register(CustomUser, CustomUserAdmin)
 
 # ----------------------------
 # Group Admin (optional)

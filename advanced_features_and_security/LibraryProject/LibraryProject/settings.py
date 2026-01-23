@@ -156,8 +156,15 @@ X_FRAME_OPTIONS = 'DENY'
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
+
+# HTTPS & SECURITY SETTINGS
+# ============================
+
+# Redirect all HTTP requests to HTTPS
+SECURE_SSL_REDIRECT = True
+
 # Optional: Strict Transport Security
-SECURE_HSTS_SECONDS = 3600  # Adjust as needed
+SECURE_HSTS_SECONDS = 31536000  # 1 year
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
@@ -173,3 +180,16 @@ MIDDLEWARE += [
 CSP_DEFAULT_SRC = ("'self'",)
 CSP_SCRIPT_SRC = ("'self'",)
 CSP_STYLE_SRC = ("'self'", "'unsafe-inline'")
+
+
+import os
+
+DEBUG = os.getenv("DJANGO_DEBUG", "True") == "True"
+
+if not DEBUG:
+    SECURE_SSL_REDIRECT = True
+    SECURE_HSTS_SECONDS = 31536000
+    SECURE_HSTS_INCLUDE_SUBDOMAINS = True
+    SECURE_HSTS_PRELOAD = True
+else:
+    SECURE_SSL_REDIRECT = False
