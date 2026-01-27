@@ -1,0 +1,170 @@
+{
+  "info": {
+    "name": "ALX Django API",
+    "_postman_id": "alx-django-api-collection",
+    "description": "Postman collection for testing Book API with token authentication",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Obtain Token",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"username\": \"<YOUR_USERNAME>\",\n    \"password\": \"<YOUR_PASSWORD>\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/api-token-auth/",
+          "protocol": "http",
+          "host": ["127.0.0.1"],
+          "port": "8000",
+          "path": ["api", "api-token-auth"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List Books",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Token <YOUR_TOKEN>"
+          }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/books/",
+          "protocol": "http",
+          "host": ["127.0.0.1"],
+          "port": "8000",
+          "path": ["api", "books"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "List All Books (CRUD)",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Token <YOUR_TOKEN>"
+          }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/books_all/",
+          "protocol": "http",
+          "host": ["127.0.0.1"],
+          "port": "8000",
+          "path": ["api", "books_all"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Create Book",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Token <YOUR_TOKEN>"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"title\": \"New Book\",\n    \"author\": \"Author Name\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/books_all/",
+          "protocol": "http",
+          "host": ["127.0.0.1"],
+          "port": "8000",
+          "path": ["api", "books_all"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Retrieve Book",
+      "request": {
+        "method": "GET",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Token <YOUR_TOKEN>"
+          }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/books_all/1/",
+          "protocol": "http",
+          "host": ["127.0.0.1"],
+          "port": "8000",
+          "path": ["api", "books_all", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Update Book",
+      "request": {
+        "method": "PUT",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Token <YOUR_TOKEN>"
+          },
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n    \"title\": \"Updated Book Title\",\n    \"author\": \"Updated Author\"\n}"
+        },
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/books_all/1/",
+          "protocol": "http",
+          "host": ["127.0.0.1"],
+          "port": "8000",
+          "path": ["api", "books_all", "1"]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "Delete Book",
+      "request": {
+        "method": "DELETE",
+        "header": [
+          {
+            "key": "Authorization",
+            "value": "Token <YOUR_TOKEN>"
+          }
+        ],
+        "url": {
+          "raw": "http://127.0.0.1:8000/api/books_all/1/",
+          "protocol": "http",
+          "host": ["127.0.0.1"],
+          "port": "8000",
+          "path": ["api", "books_all", "1"]
+        }
+      },
+      "response": []
+    }
+  ]
+}
