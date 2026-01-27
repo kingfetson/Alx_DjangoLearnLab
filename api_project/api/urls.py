@@ -10,4 +10,6 @@ urlpatterns = [
     
      # Include the router URLs for BookViewSet (all CRUD operations)
     path('', include(router.urls)),
+    
+    path('api-token-auth/', obtain_auth_token, name='api_token_auth'),
 ]
