@@ -50,8 +50,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-      
-      ]
+]
 
 ROOT_URLCONF = "api_project.urls"
 
@@ -121,11 +120,11 @@ USE_TZ = True
 STATIC_URL = "static/"
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': [
-        'rest_framework.authentication.TokenAuthentication',  # ✅ Token auth
-        'rest_framework.authentication.SessionAuthentication',  # optional for browsable API
+    "DEFAULT_AUTHENTICATION_CLASSES": [
+        "rest_framework.authentication.TokenAuthentication",  # ✅ Token auth
+        "rest_framework.authentication.SessionAuthentication",  # optional for browsable API
     ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # ✅ require authentication by default
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",  # ✅ require authentication by default
     ],
 }

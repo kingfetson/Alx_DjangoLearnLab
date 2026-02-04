@@ -8,6 +8,7 @@ class BookList(generics.ListAPIView):
     serializer_class = BookSerializer
     permission_classes = [permissions.IsAuthenticated]  # ✅ Only authenticated users
 
+
 # New ViewSet for full CRUD operations
 class BookViewSet(viewsets.ModelViewSet):
     queryset = Book.objects.all()
