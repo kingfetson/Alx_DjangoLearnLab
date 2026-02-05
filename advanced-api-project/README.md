@@ -170,6 +170,28 @@ serializer = AuthorSerializer(author)
 print(serializer.data)
 ```
 
+
+## Filtering, Searching, and Ordering
+
+The Book list endpoint supports advanced querying features:
+
+### Filtering
+- `?title=Book Title`
+- `?publication_year=2023`
+- `?author=1`
+
+### Searching
+- `?search=django`
+
+(Searches book titles and author names)
+
+### Ordering
+- `?ordering=title`
+- `?ordering=-publication_year`
+
+These features are implemented using Django REST Framework’s
+DjangoFilterBackend, SearchFilter, and OrderingFilter.
+
 ### Option 2: Django Admin
 
 1. Register models in `api/admin.py`
