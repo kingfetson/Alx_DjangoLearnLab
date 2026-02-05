@@ -7,8 +7,7 @@ This module provides API endpoints for managing books with support for:
 - Ordering by any field (especially title and publication_year)
 """
 
-from rest_framework import generics
-from rest_framework import filters
+from rest_framework import generics, filters
 from rest_framework.permissions import IsAuthenticatedOrReadOnly, IsAuthenticated
 from django_filters.rest_framework import DjangoFilterBackend
 
