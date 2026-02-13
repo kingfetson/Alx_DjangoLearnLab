@@ -18,6 +18,7 @@ from .forms import (
     CustomUserCreationForm, UserProfileForm
 )
 
+
 # ============= BLOG POST CRUD VIEWS =============
 
 class PostListView(ListView):
@@ -52,6 +53,17 @@ class PostListView(ListView):
         context['popular_tags'] = Tag.objects.all()[:10]  # Get most used tags
         return context
 
+class PostByTagListView(ListView):
+    model = Post
+    template_name = 'blog/posts_by_tag.html'  # create this template
+    context_object_name = 'posts'
+    paginate_by = 5  # optional
+
+    def get_queryset(self):
+        tag_slug = self.kwargs.get('tag_slug')
+        if tag_slug:
+            return Post.objects.filter(tags__slug=tag_slug)
+        return Post.objects.all()
 
 class PostDetailView(DetailView):
     """
@@ -60,7 +72,7 @@ class PostDetailView(DetailView):
     Template: blog/post_detail.html
     """
     model = Post
-    template_name = 'blog/post_detail.html'
+    template_name = 'blog/home.html'
     context_object_name = 'post'
     
     def get_context_data(self, **kwargs):
