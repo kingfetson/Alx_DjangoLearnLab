@@ -34,6 +34,10 @@
                     <span class="stat-value">{{ posts.count }}</span>
                     <span class="stat-label">Posts</span>
                 </div>
+                <div class="stat">
+                    <span class="stat-value">{{ comments.count }}</span>
+                    <span class="stat-label">Comments</span>
+                </div>
             </div>
         </div>
         
@@ -44,27 +48,92 @@
             {% endif %}
         </div>
         
-        <div class="user-posts">
-            <h3>Posts by {{ profile_user.username }}</h3>
-            {% if posts %}
-                {% for post in posts %}
-                    <article class="post">
-                        <h4 class="post-title">
-                            <a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a>
-                        </h4>
-                        <div class="post-meta">
-                            Published on {{ post.published_date|date:"F d, Y" }}
+        <div class="profile-tabs">
+            <ul class="tab-nav">
+                <li class="tab-link active" data-tab="posts">Posts ({{ posts.count }})</li>
+                <li class="tab-link" data-tab="comments">Comments ({{ comments.count }})</li>
+            </ul>
+            
+            <div class="tab-content">
+                <!-- Posts Tab -->
+                <div id="posts" class="tab-pane active">
+                    {% if posts %}
+                        {% for post in posts %}
+                            <article class="post">
+                                <h4 class="post-title">
+                                    <a href="{% url 'post-detail' post.pk %}">{{ post.title }}</a>
+                                </h4>
+                                <div class="post-meta">
+                                    Published on {{ post.published_date|date:"F d, Y" }}
+                                    <span class="comments-count">
+                                        <i class="fas fa-comments"></i> {{ post.get_comments_count }}
+                                    </span>
+                                </div>
+                                <div class="post-content">
+                                    {{ post.get_excerpt|truncatewords:30 }}
+                                </div>
+                                <a href="{% url 'post-detail' post.pk %}" class="btn btn-primary btn-sm">Read More</a>
+                            </article>
+                        {% endfor %}
+                    {% else %}
+                        <p>{{ profile_user.username }} hasn't written any posts yet.</p>
+                    {% endif %}
+                </div>
+                
+                <!-- Comments Tab -->
+                <div id="comments" class="tab-pane">
+                    {% if comments %}
+                        <div class="comments-list">
+                            {% for comment in comments %}
+                                <div class="comment-item">
+                                    <div class="comment-header">
+                                        <span class="comment-date">
+                                            <i class="fas fa-clock"></i> {{ comment.created_at|date:"F d, Y" }}
+                                        </span>
+                                        <span class="comment-on">
+                                            on <a href="{% url 'post-detail' comment.post.pk %}#comment-{{ comment.pk }}">
+                                                {{ comment.post.title }}
+                                            </a>
+                                        </span>
+                                    </div>
+                                    <div class="comment-content">
+                                        {{ comment.content|truncatewords:50 }}
+                                    </div>
+                                    {% if comment.is_reply %}
+                                        <span class="badge">Reply</span>
+                                    {% endif %}
+                                </div>
+                            {% endfor %}
                         </div>
-                        <div class="post-content">
-                            {{ post.content|truncatewords:50 }}
-                        </div>
-                        <a href="{% url 'post-detail' post.pk %}" class="btn btn-primary btn-sm">Read More</a>
-                    </article>
-                {% endfor %}
-            {% else %}
-                <p>{{ profile_user.username }} hasn't written any posts yet.</p>
-            {% endif %}
+                    {% else %}
+                        <p>{{ profile_user.username }} hasn't made any comments yet.</p>
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+// Tab switching functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const tabLinks = document.querySelectorAll('.tab-link');
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    
+    tabLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Remove active class from all tabs
+            tabLinks.forEach(l => l.classList.remove('active'));
+            tabPanes.forEach(p => p.classList.remove('active'));
+            
+            // Add active class to clicked tab
+            this.classList.add('active');
+            const tabId = this.getAttribute('data-tab');
+            document.getElementById(tabId).classList.add('active');
+        });
+    });
+});
+</script>
 {% endblock %}

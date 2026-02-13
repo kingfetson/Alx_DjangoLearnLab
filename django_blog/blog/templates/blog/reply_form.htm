@@ -1,0 +1,50 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ title }} - Django Blog{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>{{ title }}</h1>
+    
+    <div class="parent-comment-preview">
+        <h3>Replying to:</h3>
+        <div class="comment-preview">
+            <div class="comment-author">
+                <strong>{{ parent_comment.author.username }}</strong> said:
+            </div>
+            <div class="comment-content">
+                {{ parent_comment.content|truncatewords:30 }}
+            </div>
+        </div>
+    </div>
+    
+    <form method="post" class="reply-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="error-message">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="form-group">
+            {{ form.content }}
+            {% if form.content.errors %}
+                <div class="error-message">
+                    {% for error in form.content.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <small class="help-text">Reply must be between 3 and 1000 characters.</small>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Post Reply</button>
+            <a href="{% url 'post-detail' post.pk %}#comment-{{ parent_comment.pk }}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

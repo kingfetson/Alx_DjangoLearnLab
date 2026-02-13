@@ -1,4 +1,5 @@
 {% extends 'blog/base.html' %}
+{% load static %}
 
 {% block title %}{{ post.title }} - Django Blog{% endblock %}
 
@@ -19,6 +20,10 @@
                 <i class="fas fa-edit"></i> Updated: {{ post.updated_date|date:"F d, Y" }}
             </span>
         {% endif %}
+        <span class="comments-count">
+            <i class="fas fa-comments"></i> 
+            <a href="#comments">{{ post.get_comments_count }} Comment{{ post.get_comments_count|pluralize }}</a>
+        </span>
     </div>
     
     <div class="post-content">
@@ -38,4 +43,150 @@
         </a>
     </div>
 </article>
+
+<!-- Comments Section -->
+<section id="comments" class="comments-section">
+    <h2 class="comments-title">
+        <i class="fas fa-comments"></i> 
+        Comments ({{ post.get_comments_count }})
+    </h2>
+    
+    <!-- Add Comment Form (for authenticated users) -->
+    {% if user.is_authenticated %}
+        <div class="add-comment">
+            <h3>Add a Comment</h3>
+            <form method="post" action="{% url 'comment-create' post.pk %}" class="comment-form">
+                {% csrf_token %}
+                {{ comment_form.as_p }}
+                <button type="submit" class="btn btn-primary">Post Comment</button>
+            </form>
+        </div>
+    {% else %}
+        <div class="login-to-comment">
+            <p><a href="{% url 'login' %}?next={{ request.path }}">Login</a> to add a comment.</p>
+        </div>
+    {% endif %}
+    
+    <!-- Comments List -->
+    <div class="comments-list">
+        {% if comments %}
+            {% for comment in comments %}
+                <div class="comment" id="comment-{{ comment.id }}">
+                    <div class="comment-header">
+                        <div class="comment-author">
+                            {% if comment.author.profile.profile_pic %}
+                                <img src="{{ comment.author.profile.profile_pic.url }}" alt="{{ comment.author.username }}" class="comment-avatar">
+                            {% else %}
+                                <img src="{% static 'images/default-avatar.png' %}" alt="Default Avatar" class="comment-avatar">
+                            {% endif %}
+                            <div class="comment-author-info">
+                                <a href="{% url 'profile-view' comment.author.username %}" class="comment-author-name">
+                                    {{ comment.author.get_full_name|default:comment.author.username }}
+                                </a>
+                                <span class="comment-date">
+                                    <i class="fas fa-clock"></i> {{ comment.created_at|date:"F d, Y at g:i A" }}
+                                    {% if comment.updated_at|date:"U" != comment.created_at|date:"U" %}
+                                        <span class="edited">(edited)</span>
+                                    {% endif %}
+                                </span>
+                            </div>
+                        </div>
+                        
+                        <!-- Comment Actions (for comment author) -->
+                        {% if user == comment.author %}
+                            <div class="comment-actions">
+                                <a href="{% url 'comment-update' comment.pk %}" class="btn-icon" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'comment-delete' comment.pk %}" class="btn-icon" title="Delete">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="comment-content">
+                        {{ comment.content|linebreaks }}
+                    </div>
+                    
+                    <!-- Reply Button -->
+                    {% if user.is_authenticated %}
+                        <button class="btn-reply" onclick="showReplyForm({{ comment.id }})">
+                            <i class="fas fa-reply"></i> Reply
+                        </button>
+                        
+                        <!-- Reply Form (hidden by default) -->
+                        <div id="reply-form-{{ comment.id }}" class="reply-form-container" style="display: none;">
+                            <form method="post" action="{% url 'reply-create' comment.id %}" class="reply-form">
+                                {% csrf_token %}
+                                {{ reply_form.as_p }}
+                                <div class="reply-actions">
+                                    <button type="submit" class="btn btn-primary btn-sm">Post Reply</button>
+                                    <button type="button" class="btn btn-outline btn-sm" onclick="hideReplyForm({{ comment.id }})">Cancel</button>
+                                </div>
+                            </form>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Replies -->
+                    {% if comment.get_replies %}
+                        <div class="replies">
+                            {% for reply in comment.get_replies %}
+                                <div class="reply" id="comment-{{ reply.id }}">
+                                    <div class="comment-header">
+                                        <div class="comment-author">
+                                            {% if reply.author.profile.profile_pic %}
+                                                <img src="{{ reply.author.profile.profile_pic.url }}" alt="{{ reply.author.username }}" class="comment-avatar">
+                                            {% else %}
+                                                <img src="{% static 'images/default-avatar.png' %}" alt="Default Avatar" class="comment-avatar">
+                                            {% endif %}
+                                            <div class="comment-author-info">
+                                                <a href="{% url 'profile-view' reply.author.username %}" class="comment-author-name">
+                                                    {{ reply.author.get_full_name|default:reply.author.username }}
+                                                </a>
+                                                <span class="comment-date">
+                                                    <i class="fas fa-clock"></i> {{ reply.created_at|date:"F d, Y at g:i A" }}
+                                                    {% if reply.updated_at|date:"U" != reply.created_at|date:"U" %}
+                                                        <span class="edited">(edited)</span>
+                                                    {% endif %}
+                                                </span>
+                                            </div>
+                                        </div>
+                                        
+                                        {% if user == reply.author %}
+                                            <div class="comment-actions">
+                                                <a href="{% url 'comment-update' reply.pk %}" class="btn-icon" title="Edit">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'comment-delete' reply.pk %}" class="btn-icon" title="Delete">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <div class="comment-content">
+                                        {{ reply.content|linebreaks }}
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        {% else %}
+            <p class="no-comments">No comments yet. Be the first to comment!</p>
+        {% endif %}
+    </div>
+</section>
+
+<script>
+function showReplyForm(commentId) {
+    document.getElementById('reply-form-' + commentId).style.display = 'block';
+}
+
+function hideReplyForm(commentId) {
+    document.getElementById('reply-form-' + commentId).style.display = 'none';
+}
+</script>
 {% endblock %}

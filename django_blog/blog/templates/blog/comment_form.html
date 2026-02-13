@@ -1,0 +1,48 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}{{ title }} - Django Blog{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <h1>{{ title }}</h1>
+    
+    {% if post %}
+        <div class="post-preview">
+            <h3>On post:</h3>
+            <h4>{{ post.title }}</h4>
+            <small>by {{ post.author.username }}</small>
+        </div>
+    {% endif %}
+    
+    <form method="post" class="comment-form">
+        {% csrf_token %}
+        
+        {% if form.non_field_errors %}
+            <div class="error-message">
+                {% for error in form.non_field_errors %}
+                    {{ error }}
+                {% endfor %}
+            </div>
+        {% endif %}
+        
+        <div class="form-group">
+            {{ form.content }}
+            {% if form.content.errors %}
+                <div class="error-message">
+                    {% for error in form.content.errors %}
+                        {{ error }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+            <small class="help-text">Comment must be between 3 and 1000 characters.</small>
+        </div>
+        
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+                {% if object %}Update{% else %}Post{% endif %} Comment
+            </button>
+            <a href="{% if post %}{% url 'post-detail' post.pk %}{% else %}{% url 'home' %}{% endif %}" class="btn btn-outline">Cancel</a>
+        </div>
+    </form>
+</div>
+{% endblock %}

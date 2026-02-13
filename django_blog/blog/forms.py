@@ -1,7 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User
-from .models import Post, Profile
+from .models import Post, Profile, Comment
 
 class PostForm(forms.ModelForm):
     """
@@ -40,6 +40,72 @@ class PostForm(forms.ModelForm):
         if len(content) < 20:
             raise forms.ValidationError('Content must be at least 20 characters long.')
         return content
+
+
+class CommentForm(forms.ModelForm):
+    """
+    Form for creating and updating comments
+    """
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control comment-input',
+                'placeholder': 'Write your comment here...',
+                'rows': 3,
+                'maxlength': 1000
+            }),
+        }
+        labels = {
+            'content': ''
+        }
+    
+    def clean_content(self):
+        """
+        Custom validation for comment content
+        """
+        content = self.cleaned_data.get('content')
+        if not content or content.strip() == '':
+            raise forms.ValidationError('Comment cannot be empty.')
+        if len(content) < 3:
+            raise forms.ValidationError('Comment must be at least 3 characters long.')
+        if len(content) > 1000:
+            raise forms.ValidationError('Comment cannot exceed 1000 characters.')
+        return content.strip()
+
+
+class ReplyForm(forms.ModelForm):
+    """
+    Form for replying to comments
+    """
+    class Meta:
+        model = Comment
+        fields = ['content']
+        widgets = {
+            'content': forms.Textarea(attrs={
+                'class': 'form-control reply-input',
+                'placeholder': 'Write your reply...',
+                'rows': 2,
+                'maxlength': 1000
+            }),
+        }
+        labels = {
+            'content': ''
+        }
+    
+    def clean_content(self):
+        """
+        Custom validation for reply content
+        """
+        content = self.cleaned_data.get('content')
+        if not content or content.strip() == '':
+            raise forms.ValidationError('Reply cannot be empty.')
+        if len(content) < 3:
+            raise forms.ValidationError('Reply must be at least 3 characters long.')
+        if len(content) > 1000:
+            raise forms.ValidationError('Reply cannot exceed 1000 characters.')
+        return content.strip()
 
 
 class CustomUserCreationForm(UserCreationForm):
