@@ -3,12 +3,19 @@ from django.contrib.auth import views as auth_views
 from . import views
 
 urlpatterns = [
-    # Blog URLs
-    path('', views.home, name='home'),
-    path('post/<int:pk>/', views.post_detail, name='post-detail'),
-    path('post/new/', views.post_create, name='post-create'),
-    path('post/<int:pk>/update/', views.post_update, name='post-update'),
-    path('post/<int:pk>/delete/', views.post_delete, name='post-delete'),
+    # Blog Post CRUD URLs (Class-Based Views)
+    path('', views.PostListView.as_view(), name='home'),
+    path('post/<int:pk>/', views.PostDetailView.as_view(), name='post-detail'),
+    path('post/new/', views.PostCreateView.as_view(), name='post-create'),
+    path('post/<int:pk>/edit/', views.PostUpdateView.as_view(), name='post-update'),
+    path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post-delete'),
+    
+    # Alternative function-based URLs 
+     path('', views.home, name='home'),
+     path('post/<int:pk>/', views.post_detail, name='post-detail'),
+     path('post/new/', views.post_create, name='post-create'),
+     path('post/<int:pk>/update/', views.post_update, name='post-update'),
+     path('post/<int:pk>/delete/', views.post_delete, name='post-delete'),
     
     # Authentication URLs
     path('register/', views.register, name='register'),
@@ -38,4 +45,11 @@ urlpatterns = [
     # Profile URLs
     path('profile/', views.profile, name='profile'),
     path('profile/<str:username>/', views.profile_view, name='profile-view'),
+    
+    
+    path('', PostListView.as_view(), name='home')
+    path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail')
+    path('post/new/', PostCreateView.as_view(), name='post-create')
+    path('post/<int:pk>/edit/', PostUpdateView.as_view(), name='post-update')
+    path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete')
 ]

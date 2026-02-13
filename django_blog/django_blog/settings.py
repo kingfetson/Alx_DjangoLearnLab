@@ -124,3 +124,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Required environment variables for checker
 USER = os.getenv("USER", "django")
 PORT = os.getenv("PORT", "8000")
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'home'
+LOGOUT_REDIRECT_URL = 'home'

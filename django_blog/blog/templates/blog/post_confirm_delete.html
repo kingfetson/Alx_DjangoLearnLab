@@ -3,13 +3,30 @@
 {% block title %}Delete Post - Django Blog{% endblock %}
 
 {% block content %}
-    <h1>Delete Post</h1>
-    
-    <p>Are you sure you want to delete "{{ post.title }}"?</p>
-    
-    <form method="post">
-        {% csrf_token %}
-        <button type="submit" class="btn btn-primary">Yes, Delete</button>
-        <a href="{% url 'post-detail' post.pk %}" class="btn">Cancel</a>
-    </form>
+<div class="delete-container">
+    <div class="delete-card">
+        <h1>Delete Post</h1>
+        
+        <div class="warning-message">
+            <i class="fas fa-exclamation-triangle"></i>
+            <p>Are you sure you want to delete "{{ post.title }}"?</p>
+            <p class="warning-text">This action cannot be undone.</p>
+        </div>
+        
+        <div class="post-preview">
+            <h3>Post Preview:</h3>
+            <h4>{{ post.title }}</h4>
+            <p>{{ post.content|truncatewords:30 }}</p>
+            <small>By {{ post.author.username }} on {{ post.published_date|date:"F d, Y" }}</small>
+        </div>
+        
+        <form method="post">
+            {% csrf_token %}
+            <div class="form-actions">
+                <button type="submit" class="btn btn-danger">Yes, Delete Post</button>
+                <a href="{% url 'post-detail' post.pk %}" class="btn btn-outline">Cancel</a>
+            </div>
+        </form>
+    </div>
+</div>
 {% endblock %}
