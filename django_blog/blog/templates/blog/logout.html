@@ -1,0 +1,31 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Logged Out - Django Blog{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <h1>Logged Out Successfully</h1>
+    
+    <div class="success-message">
+        <i class="fas fa-check-circle" style="font-size: 64px; color: #4CAF50; margin-bottom: 20px;"></i>
+        <p style="font-size: 18px; margin-bottom: 30px; color: #333;">
+            You have been logged out successfully.
+        </p>
+        <p style="color: #666; margin-bottom: 20px;">
+            Thank you for visiting Django Blog. Come back soon!
+        </p>
+    </div>
+    
+    <div class="auth-links">
+        <p><a href="{% url 'login' %}" class="btn btn-primary">Log In Again</a></p>
+        <p><a href="{% url 'home' %}">Go to Home Page</a></p>
+    </div>
+</div>
+
+<style>
+    .success-message {
+        text-align: center;
+        padding: 20px;
+    }
+</style>
+{% endblock %}
