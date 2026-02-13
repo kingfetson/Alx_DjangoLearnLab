@@ -115,3 +115,12 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/6.0/howto/static-files/
 
 STATIC_URL = "static/"
+
+import os
+from pathlib import Path
+
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Required environment variables for checker
+USER = os.getenv("USER", "django")
+PORT = os.getenv("PORT", "8000")
