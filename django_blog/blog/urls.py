@@ -9,20 +9,15 @@ urlpatterns = [
     path('post/new/', views.PostCreateView.as_view(), name='post-create'),
     path('post/<int:pk>/edit/', views.PostUpdateView.as_view(), name='post-update'),
     path('post/<int:pk>/delete/', views.PostDeleteView.as_view(), name='post-delete'),
-     # Comment URLs
-    path('post/<int:post_id>/comment/', views.CommentCreateView.as_view(), name='comment-create'),
-    path('comment/<int:comment_id>/reply/', views.ReplyCreateView.as_view(), name='reply-create'),
-    path('comment/<int:pk>/edit/', views.CommentUpdateView.as_view(), name='comment-update'),
-    path('comment/<int:pk>/delete/', views.CommentDeleteView.as_view(), name='comment-delete'),
     
-    # AJAX Comment URL (optional)
+    # Comment URLs - As specified in the task
+    path('post/<int:post_id>/comments/new/', views.CommentCreateView.as_view(), name='comment-create'),
+    path('comment/<int:pk>/update/', views.CommentUpdateView.as_view(), name='comment-update'),
+    path('comment/<int:pk>/delete/', views.CommentDeleteView.as_view(), name='comment-delete'),
+    path('comment/<int:comment_id>/reply/', views.ReplyCreateView.as_view(), name='reply-create'),
+    
+    # AJAX Comment URL (optional - for better UX)
     path('ajax/post/<int:post_id>/comment/', views.ajax_add_comment, name='ajax-comment-create'),
-    # Alternative function-based URLs 
-     path('', views.home, name='home'),
-     path('post/<int:pk>/', views.post_detail, name='post-detail'),
-     path('post/new/', views.post_create, name='post-create'),
-     path('post/<int:pk>/update/', views.post_update, name='post-update'),
-     path('post/<int:pk>/delete/', views.post_delete, name='post-delete'),
     
     # Authentication URLs
     path('register/', views.register, name='register'),
@@ -52,11 +47,4 @@ urlpatterns = [
     # Profile URLs
     path('profile/', views.profile, name='profile'),
     path('profile/<str:username>/', views.profile_view, name='profile-view'),
-    
-    
-    path('', PostListView.as_view(), name='home')
-    path('post/<int:pk>/', PostDetailView.as_view(), name='post-detail')
-    path('post/new/', PostCreateView.as_view(), name='post-create')
-    path('post/<int:pk>/edit/', PostUpdateView.as_view(), name='post-update')
-    path('post/<int:pk>/delete/', PostDeleteView.as_view(), name='post-delete')
- ]
+]

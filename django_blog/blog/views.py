@@ -154,13 +154,14 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 class CommentCreateView(LoginRequiredMixin, CreateView):
     """
     View to create a new comment on a post
-    URL: /post/<int:post_id>/comment/
+    URL: /post/<int:post_id>/comments/new/
     """
     model = Comment
     form_class = CommentForm
     template_name = 'blog/comment_form.html'
     
     def dispatch(self, request, *args, **kwargs):
+        # Get post_id from URL kwargs (matches the pattern)
         self.post = get_object_or_404(Post, pk=kwargs.get('post_id'))
         return super().dispatch(request, *args, **kwargs)
     
@@ -178,7 +179,6 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         context['post'] = self.post
         context['title'] = 'Add Comment'
         return context
-
 
 class ReplyCreateView(LoginRequiredMixin, CreateView):
     """

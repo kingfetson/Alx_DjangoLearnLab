@@ -1183,3 +1183,56 @@ footer {
         grid-template-columns: 1fr;
     }
 }
+
+/* Fix for comment actions positioning */
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 10px;
+    margin-left: auto;
+}
+
+/* Ensure reply button appears below comment content */
+.btn-reply {
+    margin-top: 10px;
+    margin-bottom: 10px;
+}
+
+/* Fix for reply form positioning */
+.reply-form-container {
+    margin-top: 15px;
+    margin-bottom: 15px;
+}
+
+/* Ensure replies are properly indented */
+.replies {
+    margin-left: 30px;
+    border-left: 2px solid #e8491d;
+    padding-left: 20px;
+    margin-top: 15px;
+}
+
+/* Responsive fixes */
+@media(max-width: 768px) {
+    .comment-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .comment-actions {
+        margin-left: 0;
+        margin-top: 10px;
+    }
+    
+    .replies {
+        margin-left: 15px;
+        padding-left: 10px;
+    }
+}
