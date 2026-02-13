@@ -109,6 +109,25 @@
                         {{ comment.content|linebreaks }}
                     </div>
                     
+                    <!-- Related Posts -->
+{% if related_posts %}
+    <div class="related-posts">
+        <h3><i class="fas fa-link"></i> Related Posts</h3>
+        <div class="related-posts-grid">
+            {% for related in related_posts %}
+                <div class="related-post-card">
+                    <h4><a href="{% url 'post-detail' related.pk %}">{{ related.title }}</a></h4>
+                    <div class="post-meta">
+                        <span class="author">{{ related.author.username }}</span>
+                        <span class="date">{{ related.published_date|date:"M d, Y" }}</span>
+                    </div>
+                    <p>{{ related.get_excerpt|truncatewords:15 }}</p>
+                    <a href="{% url 'post-detail' related.pk %}" class="btn btn-outline btn-sm">Read</a>
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endif %}
                     <!-- Reply Button -->
                     {% if user.is_authenticated %}
                         <button class="btn-reply" onclick="showReplyForm({{ comment.id }})">

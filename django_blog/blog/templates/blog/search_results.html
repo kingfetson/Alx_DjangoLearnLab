@@ -1,34 +1,26 @@
 {% extends 'blog/base.html' %}
 {% load static %}
 
-{% block title %}Home - Django Blog{% endblock %}
+{% block title %}Search Results - Django Blog{% endblock %}
 
 {% block content %}
-<div class="home-header">
-    <h1>Latest Posts</h1>
+<div class="search-header">
+    <h1>Search Results</h1>
     
     <!-- Search Form -->
     <form method="get" action="{% url 'search' %}" class="search-form">
         {{ search_form.query }}
         <button type="submit" class="btn btn-primary">
-            <i class="fas fa-search"></i> Search
+            <i class="fas fa-search"></i> Search Again
         </button>
     </form>
+    
+    {% if search_query %}
+        <p class="search-summary">
+            Found <strong>{{ result_count }}</strong> result{{ result_count|pluralize }} for "{{ search_query }}"
+        </p>
+    {% endif %}
 </div>
-
-<!-- Popular Tags -->
-{% if popular_tags %}
-    <div class="tag-cloud">
-        <h3><i class="fas fa-tags"></i> Popular Tags</h3>
-        <div class="tags-list">
-            {% for tag in popular_tags %}
-                <a href="{% url 'posts-by-tag' tag.slug %}" class="tag">
-                    {{ tag.name }}
-                </a>
-            {% endfor %}
-        </div>
-    </div>
-{% endif %}
 
 {% if posts %}
     {% for post in posts %}
@@ -44,11 +36,6 @@
                 <span class="date">
                     <i class="fas fa-calendar"></i> {{ post.published_date|date:"F d, Y" }}
                 </span>
-                {% if post.updated_date|date:"U" != post.published_date|date:"U" %}
-                    <span class="updated">
-                        <i class="fas fa-edit"></i> Updated: {{ post.updated_date|date:"F d, Y" }}
-                    </span>
-                {% endif %}
                 <span class="comments-count">
                     <i class="fas fa-comments"></i> 
                     <a href="{% url 'post-detail' post.pk %}#comments">{{ post.get_comments_count }} Comment{{ post.get_comments_count|pluralize }}</a>
@@ -70,11 +57,6 @@
             </div>
             <div class="post-actions">
                 <a href="{% url 'post-detail' post.pk %}" class="btn btn-primary">Read More</a>
-                
-                {% if user == post.author %}
-                    <a href="{% url 'post-update' post.pk %}" class="btn btn-secondary">Edit</a>
-                    <a href="{% url 'post-delete' post.pk %}" class="btn btn-danger">Delete</a>
-                {% endif %}
             </div>
         </article>
     {% endfor %}
@@ -83,8 +65,8 @@
     {% if is_paginated %}
         <div class="pagination">
             {% if page_obj.has_previous %}
-                <a href="?page=1{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline">&laquo; First</a>
-                <a href="?page={{ page_obj.previous_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline">Previous</a>
+                <a href="?page=1&q={{ search_query }}" class="btn btn-outline">&laquo; First</a>
+                <a href="?page={{ page_obj.previous_page_number }}&q={{ search_query }}" class="btn btn-outline">Previous</a>
             {% endif %}
             
             <span class="current-page">
@@ -92,18 +74,34 @@
             </span>
             
             {% if page_obj.has_next %}
-                <a href="?page={{ page_obj.next_page_number }}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline">Next</a>
-                <a href="?page={{ page_obj.paginator.num_pages }}{% if search_query %}&q={{ search_query }}{% endif %}" class="btn btn-outline">Last &raquo;</a>
+                <a href="?page={{ page_obj.next_page_number }}&q={{ search_query }}" class="btn btn-outline">Next</a>
+                <a href="?page={{ page_obj.paginator.num_pages }}&q={{ search_query }}" class="btn btn-outline">Last &raquo;</a>
             {% endif %}
         </div>
     {% endif %}
     
 {% else %}
-    <div class="no-posts">
-        <p>No posts available yet.</p>
-        {% if user.is_authenticated %}
-            <p><a href="{% url 'post-create' %}" class="btn btn-primary">Create your first post!</a></p>
+    <div class="no-results">
+        {% if search_query %}
+            <p>No posts found matching "{{ search_query }}".</p>
+            <p>Try different keywords or browse by tags below.</p>
+        {% else %}
+            <p>Enter a search term to find posts.</p>
         {% endif %}
+    </div>
+{% endif %}
+
+<!-- Popular Tags -->
+{% if popular_tags %}
+    <div class="tag-cloud">
+        <h3><i class="fas fa-tags"></i> Browse by Tags</h3>
+        <div class="tags-list">
+            {% for tag in popular_tags %}
+                <a href="{% url 'posts-by-tag' tag.slug %}" class="tag">
+                    {{ tag.name }}
+                </a>
+            {% endfor %}
+        </div>
     </div>
 {% endif %}
 {% endblock %}

@@ -2,16 +2,18 @@ from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
 from PIL import Image
+from taggit.managers import TaggableManager  # Add this import
 
 class Post(models.Model):
     """
-    Blog post model with complete CRUD support
+    Blog post model with complete CRUD support and tagging
     """
     title = models.CharField(max_length=200)
     content = models.TextField()
     published_date = models.DateTimeField(auto_now_add=True)
     updated_date = models.DateTimeField(auto_now=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='blog_posts')
+    tags = TaggableManager(blank=True)  # Add this line for tagging
     
     class Meta:
         ordering = ['-published_date']  # Most recent posts first
@@ -46,6 +48,10 @@ class Post(models.Model):
     def get_comments_count(self):
         """Returns the total number of approved comments for this post"""
         return self.comments.filter(is_approved=True).count()
+    
+    def get_tags_list(self):
+        """Returns a list of tags for this post"""
+        return self.tags.all()
 
 
 class Comment(models.Model):

@@ -11,9 +11,10 @@ from django.views.generic import (
 )
 from django.urls import reverse_lazy, reverse
 from django.http import JsonResponse
+from taggit.models import Tag  # Add this import
 from .models import Post, Profile, Comment
 from .forms import (
-    PostForm, CommentForm, ReplyForm, 
+    PostForm, CommentForm, ReplyForm, SearchForm,
     CustomUserCreationForm, UserProfileForm
 )
 
@@ -38,14 +39,17 @@ class PostListView(ListView):
             queryset = queryset.filter(
                 Q(title__icontains=query) |
                 Q(content__icontains=query) |
-                Q(author__username__icontains=query)
-            )
+                Q(author__username__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct()
         return queryset
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['title'] = 'Home'
         context['search_query'] = self.request.GET.get('q', '')
+        context['search_form'] = SearchForm(initial={'query': self.request.GET.get('q', '')})
+        context['popular_tags'] = Tag.objects.all()[:10]  # Get most used tags
         return context
 
 
@@ -75,6 +79,16 @@ class PostDetailView(DetailView):
         if self.request.user.is_authenticated:
             context['comment_form'] = CommentForm()
             context['reply_form'] = ReplyForm()
+        
+        # Get related posts by tags
+        post_tags = self.object.tags.all()
+        if post_tags:
+            related_posts = Post.objects.filter(
+                tags__in=post_tags
+            ).exclude(
+                id=self.object.id
+            ).distinct()[:5]
+            context['related_posts'] = related_posts
         
         return context
 
@@ -149,6 +163,79 @@ class PostDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
+# ============= TAG AND SEARCH VIEWS =============
+
+class TagListView(ListView):
+    """
+    View to display all posts with a specific tag
+    URL: /tags/<slug:tag_slug>/
+    Template: blog/tag_posts.html
+    """
+    model = Post
+    template_name = 'blog/tag_posts.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        self.tag = get_object_or_404(Tag, slug=self.kwargs['tag_slug'])
+        return Post.objects.filter(tags__in=[self.tag]).order_by('-published_date')
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['tag'] = self.tag
+        context['title'] = f'Posts tagged with "{self.tag.name}"'
+        context['search_form'] = SearchForm()
+        return context
+
+
+class SearchResultsView(ListView):
+    """
+    View to display search results
+    URL: /search/
+    Template: blog/search_results.html
+    """
+    model = Post
+    template_name = 'blog/search_results.html'
+    context_object_name = 'posts'
+    paginate_by = 10
+    
+    def get_queryset(self):
+        query = self.request.GET.get('q', '').strip()
+        self.search_query = query
+        
+        if query:
+            # Search in title, content, author username, and tags
+            return Post.objects.filter(
+                Q(title__icontains=query) |
+                Q(content__icontains=query) |
+                Q(author__username__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct().order_by('-published_date')
+        return Post.objects.none()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['title'] = 'Search Results'
+        context['search_query'] = self.search_query
+        context['search_form'] = SearchForm(initial={'query': self.search_query})
+        context['result_count'] = self.get_queryset().count()
+        return context
+
+
+def autocomplete_tags(request):
+    """
+    AJAX view for tag autocomplete
+    URL: /tags/autocomplete/
+    """
+    if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+        query = request.GET.get('q', '')
+        if query:
+            tags = Tag.objects.filter(name__icontains=query)[:10]
+            data = [{'id': tag.id, 'name': tag.name} for tag in tags]
+            return JsonResponse(data, safe=False)
+    return JsonResponse([], safe=False)
+
+
 # ============= COMMENT VIEWS =============
 
 class CommentCreateView(LoginRequiredMixin, CreateView):
@@ -161,7 +248,6 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
     template_name = 'blog/comment_form.html'
     
     def dispatch(self, request, *args, **kwargs):
-        # Get post_id from URL kwargs (matches the pattern)
         self.post = get_object_or_404(Post, pk=kwargs.get('post_id'))
         return super().dispatch(request, *args, **kwargs)
     
@@ -179,6 +265,7 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         context['post'] = self.post
         context['title'] = 'Add Comment'
         return context
+
 
 class ReplyCreateView(LoginRequiredMixin, CreateView):
     """
@@ -215,7 +302,7 @@ class CommentUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     """
     View to edit a comment
     Only the comment author can edit
-    URL: /comment/<int:pk>/edit/
+    URL: /comment/<int:pk>/update/
     """
     model = Comment
     form_class = CommentForm
@@ -260,7 +347,7 @@ class CommentDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         return super().delete(request, *args, **kwargs)
 
 
-# ============= AJAX COMMENT VIEWS (Optional - for better UX) =============
+# ============= AJAX COMMENT VIEWS =============
 
 @login_required
 def ajax_add_comment(request, post_id):
@@ -404,7 +491,7 @@ def profile_view(request, username):
 
 def home(request):
     """
-    Function-based home view (for backward compatibility)
+    Function-based home view with search (for backward compatibility)
     """
     posts = Post.objects.all().order_by('-published_date')
     query = request.GET.get('q')
@@ -412,9 +499,16 @@ def home(request):
         posts = posts.filter(
             Q(title__icontains=query) |
             Q(content__icontains=query) |
-            Q(author__username__icontains=query)
-        )
-    return render(request, 'blog/home.html', {'posts': posts})
+            Q(author__username__icontains=query) |
+            Q(tags__name__icontains=query)
+        ).distinct()
+    
+    context = {
+        'posts': posts,
+        'search_form': SearchForm(initial={'query': query}),
+        'popular_tags': Tag.objects.all()[:10]
+    }
+    return render(request, 'blog/home.html', context)
 
 
 def post_detail(request, pk):
@@ -447,6 +541,7 @@ def post_create(request):
             post = form.save(commit=False)
             post.author = request.user
             post.save()
+            form.save_m2m()  # Save tags
             messages.success(request, 'Post created successfully!')
             return redirect('post-detail', pk=post.pk)
     else:

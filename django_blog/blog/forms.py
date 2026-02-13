@@ -1,15 +1,16 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm, UserChangeForm
 from django.contrib.auth.models import User
+from taggit.forms import TagWidget  # Add this import
 from .models import Post, Profile, Comment
 
 class PostForm(forms.ModelForm):
     """
-    Form for creating and updating blog posts
+    Form for creating and updating blog posts with tags
     """
     class Meta:
         model = Post
-        fields = ['title', 'content']
+        fields = ['title', 'content', 'tags']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -20,6 +21,10 @@ class PostForm(forms.ModelForm):
                 'class': 'form-control',
                 'placeholder': 'Write your post content here...',
                 'rows': 10
+            }),
+            'tags': TagWidget(attrs={
+                'class': 'form-control',
+                'placeholder': 'Enter tags separated by commas (e.g., python, django, tutorial)'
             }),
         }
     
@@ -40,6 +45,18 @@ class PostForm(forms.ModelForm):
         if len(content) < 20:
             raise forms.ValidationError('Content must be at least 20 characters long.')
         return content
+    
+    def clean_tags(self):
+        """
+        Custom validation for tags
+        """
+        tags = self.cleaned_data.get('tags')
+        if tags:
+            # Convert tags to string and validate
+            tags_str = str(tags)
+            if len(tags_str) > 200:
+                raise forms.ValidationError('Tags are too long. Please use fewer tags or shorter tag names.')
+        return tags
 
 
 class CommentForm(forms.ModelForm):
@@ -106,6 +123,26 @@ class ReplyForm(forms.ModelForm):
         if len(content) > 1000:
             raise forms.ValidationError('Reply cannot exceed 1000 characters.')
         return content.strip()
+
+
+class SearchForm(forms.Form):
+    """
+    Form for searching posts
+    """
+    query = forms.CharField(
+        max_length=100,
+        required=False,
+        widget=forms.TextInput(attrs={
+            'class': 'form-control search-input',
+            'placeholder': 'Search posts by title, content, or tags...'
+        })
+    )
+    
+    def clean_query(self):
+        query = self.cleaned_data.get('query', '').strip()
+        if query and len(query) < 2:
+            raise forms.ValidationError('Search query must be at least 2 characters long.')
+        return query
 
 
 class CustomUserCreationForm(UserCreationForm):

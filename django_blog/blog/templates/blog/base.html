@@ -15,25 +15,43 @@
             <div id="branding">
                 <h1><span class="highlight">Django</span> Blog</h1>
             </div>
-            <nav>
-                <ul>
-                    <li {% if request.path == '/' %}class="current"{% endif %}>
-                        <a href="{% url 'home' %}">Home</a>
-                    </li>
-                    {% if user.is_authenticated %}
-                        <li><a href="{% url 'post-create' %}">New Post</a></li>
-                        <li><a href="{% url 'logout' %}">Logout ({{ user.username }})</a></li>
-                    {% else %}
-                        <li {% if request.path == '/login/' %}class="current"{% endif %}>
-                            <a href="{% url 'login' %}">Login</a>
-                        </li>
-                        <li {% if request.path == '/register/' %}class="current"{% endif %}>
-                            <a href="{% url 'register' %}">Register</a>
-                        </li>
-                    {% endif %}
+           <nav>
+    <ul>
+        <li {% if request.path == '/' %}class="current"{% endif %}>
+            <a href="{% url 'home' %}">Home</a>
+        </li>
+        {% if user.is_authenticated %}
+            <li><a href="{% url 'post-create' %}">New Post</a></li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle">
+                    {{ user.username }} <span class="caret">▼</span>
+                </a>
+                <ul class="dropdown-menu">
+                    <li><a href="{% url 'profile' %}">My Profile</a></li>
+                    <li><a href="{% url 'password_change' %}">Change Password</a></li>
+                    <li><a href="{% url 'logout' %}">Logout</a></li>
                 </ul>
-            </nav>
-        </div>
+            </li>
+        {% else %}
+            <li {% if request.path == '/login/' %}class="current"{% endif %}>
+                <a href="{% url 'login' %}">Login</a>
+            </li>
+            <li {% if request.path == '/register/' %}class="current"{% endif %}>
+                <a href="{% url 'register' %}">Register</a>
+            </li>
+        {% endif %}
+    </ul>
+</nav>
+
+<!-- Add search form in header for quick access -->
+<div class="header-search">
+    <form method="get" action="{% url 'search' %}" class="header-search-form">
+        <input type="text" name="q" placeholder="Search posts..." class="header-search-input">
+        <button type="submit" class="header-search-btn">
+            <i class="fas fa-search"></i>
+        </button>
+    </form>
+</div>
     </header>
 
     <main>
