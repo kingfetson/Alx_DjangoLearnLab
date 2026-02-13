@@ -1,0 +1,45 @@
+{% extends 'blog/base.html' %}
+
+{% block title %}Register - Django Blog{% endblock %}
+
+{% block content %}
+    <h1>Register</h1>
+    
+    <form method="post">
+        {% csrf_token %}
+        
+        <div class="form-group">
+            <label for="{{ form.username.id_for_label }}">Username:</label>
+            {{ form.username }}
+            {{ form.username.errors }}
+            <small>Required. 150 characters or fewer. Letters, digits and @/./+/-/_ only.</small>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.password1.id_for_label }}">Password:</label>
+            {{ form.password1 }}
+            {{ form.password1.errors }}
+            <small>
+                <ul>
+                    <li>Your password can't be too similar to your other personal information.</li>
+                    <li>Your password must contain at least 8 characters.</li>
+                    <li>Your password can't be a commonly used password.</li>
+                    <li>Your password can't be entirely numeric.</li>
+                </ul>
+            </small>
+        </div>
+        
+        <div class="form-group">
+            <label for="{{ form.password2.id_for_label }}">Confirm Password:</label>
+            {{ form.password2 }}
+            {{ form.password2.errors }}
+            <small>Enter the same password as before, for verification.</small>
+        </div>
+        
+        <button type="submit" class="btn btn-primary">Register</button>
+    </form>
+    
+    <p style="margin-top: 20px;">
+        Already have an account? <a href="{% url 'login' %}">Login here</a>
+    </p>
+{% endblock %}

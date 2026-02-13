@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Django Blog{% endblock %}</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+</head>
+<body>
+    <header>
+        <div class="container">
+            <div id="branding">
+                <h1><span class="highlight">Django</span> Blog</h1>
+            </div>
+            <nav>
+                <ul>
+                    <li {% if request.path == '/' %}class="current"{% endif %}>
+                        <a href="{% url 'home' %}">Home</a>
+                    </li>
+                    {% if user.is_authenticated %}
+                        <li><a href="{% url 'post-create' %}">New Post</a></li>
+                        <li><a href="{% url 'logout' %}">Logout ({{ user.username }})</a></li>
+                    {% else %}
+                        <li {% if request.path == '/login/' %}class="current"{% endif %}>
+                            <a href="{% url 'login' %}">Login</a>
+                        </li>
+                        <li {% if request.path == '/register/' %}class="current"{% endif %}>
+                            <a href="{% url 'register' %}">Register</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <div class="container main-content">
+            {% if messages %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }}">
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            {% endif %}
+            
+            {% block content %}
+            {% endblock %}
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 Django Blog. All rights reserved.</p>
+    </footer>
+
+    <script src="{% static 'js/main.js' %}"></script>
+</body>
+</html>
