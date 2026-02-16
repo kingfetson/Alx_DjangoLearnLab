@@ -1,40 +1,45 @@
-from rest_framework import generics, permissions, viewsets
+from rest_framework import generics, permissions, viewsets, status
 from rest_framework.response import Response
-from .serializers import PostSerializer, CommentSerializer
 
-from rest_framework import generics, permissions, status
-from .models import Post, Like, Comment
+from .models import Post, Comment, Like
+from .serializers import PostSerializer, CommentSerializer
 from notifications.models import Notification
+
 
 class FeedView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request):
-        # Get the users the current user is following
+        # Users the current user follows
         following_users = request.user.following.all()
 
-        # Fetch posts from followed users, ordered by newest first
-        posts = Post.objects.filter(author__in=following_users).order_by('-created_at')
+        # Posts from followed users, newest first
+        posts = Post.objects.filter(
+            author__in=following_users
+        ).order_by('-created_at')
 
         serializer = PostSerializer(posts, many=True)
         return Response(serializer.data)
-
 
 
 class LikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = Post.objects.filter(id=pk).first()
-        if not post:
-            return Response({"detail": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+        post = generics.get_object_or_404(Post, pk=pk)
 
-        # Check if user already liked
-        like, created = Like.objects.get_or_create(user=request.user, post=post)
+        like, created = Like.objects.get_or_create(
+            user=request.user,
+            post=post
+        )
+
         if not created:
-            return Response({"detail": "You already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+            return Response(
+                {"detail": "You already liked this post."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
 
-        # Create notification for post author (if not liking own post)
+        # Create notification (if not liking own post)
         if post.author != request.user:
             Notification.objects.create(
                 recipient=post.author,
@@ -43,22 +48,34 @@ class LikePostView(generics.GenericAPIView):
                 target=post
             )
 
-        return Response({"detail": "Post liked."}, status=status.HTTP_201_CREATED)
+        return Response(
+            {"detail": "Post liked."},
+            status=status.HTTP_201_CREATED
+        )
 
 
 class UnlikePostView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, pk):
-        post = Post.objects.filter(id=pk).first()
-        if not post:
-            return Response({"detail": "Post not found."}, status=status.HTTP_404_NOT_FOUND)
+        post = generics.get_object_or_404(Post, pk=pk)
 
-        like = Like.objects.filter(user=request.user, post=post).first()
-        if like:
-            like.delete()
-            return Response({"detail": "Post unliked."}, status=status.HTTP_200_OK)
-        return Response({"detail": "You have not liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+        like = Like.objects.filter(
+            user=request.user,
+            post=post
+        ).first()
+
+        if not like:
+            return Response(
+                {"detail": "You have not liked this post."},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+
+        like.delete()
+        return Response(
+            {"detail": "Post unliked."},
+            status=status.HTTP_200_OK
+        )
 
 
 class PostViewSet(viewsets.ModelViewSet):
@@ -68,6 +85,7 @@ class PostViewSet(viewsets.ModelViewSet):
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all().order_by('-created_at')
