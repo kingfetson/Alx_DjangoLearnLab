@@ -23,3 +23,18 @@ db.sqlite3
 .DS_Store
 .venv/
 __pycache__/
+# Virtual environment
+venv/
+
+# Python cache
+__pycache__/
+*.pyc
+
+# Database
+db.sqlite3
+
+# Media uploads
+media/
+
+# Environment variables
+.env
