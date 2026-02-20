@@ -10,8 +10,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # ========================
 
 SECRET_KEY = config("SECRET_KEY", default="unsafe-secret-key-for-dev")
-
-DEBUG =False
+DEBUG = config("DEBUG", default=False, cast=bool)
 
 ALLOWED_HOSTS = [
     "localhost",
@@ -77,9 +76,6 @@ WSGI_APPLICATION = "social_media_api.wsgi.application"
 # DATABASE
 # ========================
 
-from decouple import config
-DEBUG = config("DEBUG", default=DEBUG, cast=bool)
-
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
@@ -87,7 +83,7 @@ DATABASES = {
         "USER": config("DB_USER", default="postgres"),
         "PASSWORD": config("DB_PASSWORD", default="postgres"),
         "HOST": config("DB_HOST", default="localhost"),
-        "PORT": config("PORT", default="5432"),
+        "PORT": config("DB_PORT", default="5432"),
     }
 }
 
