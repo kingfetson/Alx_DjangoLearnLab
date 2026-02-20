@@ -78,6 +78,7 @@ WSGI_APPLICATION = "social_media_api.wsgi.application"
 # ========================
 
 from decouple import config
+DEBUG = config("DEBUG", default=DEBUG, cast=bool)
 
 DATABASES = {
     "default": {
