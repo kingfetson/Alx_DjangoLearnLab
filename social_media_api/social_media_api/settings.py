@@ -23,9 +23,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = "django-insecure-esf(!(h=_$-(olsl#s&%4^rtff)c#2qgvy)u*e-b9=%-rtxdu1"
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    'your-app-name.herokuapp.com',
+    'localhost',
+    '127.0.0.1',
+]
+
 
 
 # Application definition
@@ -136,3 +141,15 @@ CSRF_TRUSTED_ORIGINS = [
     "https://localhost:8000",
     "http://localhost:8000",
 ]
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = "DENY"
+
+SECURE_SSL_REDIRECT = True
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
+
+from decouple import config
+
+SECRET_KEY = config('SECRET_KEY')
+DEBUG = config('DEBUG', cast=bool)
