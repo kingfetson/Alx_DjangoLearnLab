@@ -11,7 +11,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config("SECRET_KEY", default="unsafe-secret-key-for-dev")
 
-DEBUG = config("DEBUG", default=False, cast=bool)
+DEBUG =False
 
 ALLOWED_HOSTS = [
     "localhost",
